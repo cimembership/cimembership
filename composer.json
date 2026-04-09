@@ -13,7 +13,7 @@
         "platform",
         "base"
     ],
-    "homepage": "https://github.com/cimembership/cimembership",
+    "homepage": "https://cimembership.io",
     "license": "MIT",
     "authors": [
         {
@@ -72,7 +72,9 @@
     "support": {
         "forum": "https://github.com/cimembership/cimembership/discussions",
         "source": "https://github.com/cimembership/cimembership",
-        "issues": "https://github.com/cimembership/cimembership/issues"
+        "issues": "https://github.com/cimembership/cimembership/issues",
+        "email": "support@cimembership.io",
+        "website": "https://cimembership.io"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
