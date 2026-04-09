@@ -1,0 +1,78 @@
+#-------------------------
+# Environment Files
+#-------------------------
+
+.env
+.env.backup
+.env.production
+
+#-------------------------
+# Claude Code
+#-------------------------
+
+/.claude/
+.claude/
+
+#-------------------------
+# Composer
+#-------------------------
+
+/vendor/
+composer.lock
+
+#-------------------------
+# CodeIgniter
+#-------------------------
+
+writable/cache/*
+!writable/cache/index.html
+writable/logs/*
+!writable/logs/index.html
+writable/session/*
+!writable/session/index.html
+writable/uploads/*
+!writable/uploads/index.html
+writable/debugbar/*
+!writable/debugbar/.gitkeep
+writable/*.db
+
+#-------------------------
+# Testing
+#-------------------------
+
+.phpunit.result.cache
+phpunit.xml.dist.backup
+
+#-------------------------
+# IDE
+#-------------------------
+
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+#-------------------------
+# Node (if using npm)
+#-------------------------
+
+node_modules/
+npm-debug.log
+yarn-error.log
+
+#-------------------------
+# Build
+#-------------------------
+
+/build/
+/dist/
+
+#-------------------------
+# Misc
+#-------------------------
+
+*.log
+*.sql
+*.sqlite

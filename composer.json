@@ -1,0 +1,86 @@
+{
+    "name": "cimembership/cimembership",
+    "description": "CodeIgniter 4 Membership Management System - Base Platform",
+    "type": "library",
+    "keywords": [
+        "codeigniter",
+        "codeigniter4",
+        "membership",
+        "authentication",
+        "oauth",
+        "user-management",
+        "auth",
+        "platform",
+        "base"
+    ],
+    "homepage": "https://github.com/cimembership/cimembership",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CIMembership Team",
+            "email": "team@cimembership.com",
+            "homepage": "https://cimembership.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "codeigniter4/framework": "^4.5",
+        "codeigniter4/settings": "^2.0",
+        "league/oauth2-facebook": "^2.2",
+        "league/oauth2-google": "^4.0",
+        "league/oauth2-github": "^3.1",
+        "league/oauth2-linkedin": "^5.1",
+        "league/oauth2-instagram": "^3.1",
+        "league/oauth2-client": "^2.7",
+        "gregwar/captcha": "^1.2",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "require-dev": {
+        "codeigniter4/devkit": "^1.2",
+        "phpunit/phpunit": "^10.5",
+        "fakerphp/faker": "^1.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "CIMembership\\": "src/",
+            "CIMembership\\Commands\\": "src/Commands/",
+            "CIMembership\\Database\\Migrations\\": "src/Database/Migrations/",
+            "CIMembership\\Database\\Seeds\\": "src/Database/Seeds/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CIMembership\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "post-install-cmd": [
+            "CIMembership\\Install\\Installer::postInstall"
+        ],
+        "post-update-cmd": [
+            "CIMembership\\Install\\Installer::postUpdate"
+        ]
+    },
+    "extra": {
+        "ci4-extension": {
+            "name": "CIMembership",
+            "title": "CIMembership Base Platform",
+            "description": "Membership management system base for CodeIgniter 4"
+        }
+    },
+    "support": {
+        "forum": "https://github.com/cimembership/cimembership/discussions",
+        "source": "https://github.com/cimembership/cimembership",
+        "issues": "https://github.com/cimembership/cimembership/issues"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}
