@@ -216,7 +216,7 @@ CIMembership is open-source software licensed under the [MIT license](LICENSE).
 
 ## Support
 
-- **Documentation**: [https://docs.cimembership.com](https://docs.cimembership.com)
+- **Documentation**: [https://github.com/cimembership/cimembership/blob/main/README.md](https://github.com/cimembership/cimembership/blob/main/README.md)
 - **Issues**: [GitHub Issues](https://github.com/cimembership/cimembership/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/cimembership/cimembership/discussions)
 
