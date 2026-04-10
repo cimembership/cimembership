@@ -1,6 +1,7 @@
 {
     "name": "cimembership/cimembership",
     "description": "CodeIgniter 4 Membership Management System - Base Platform",
+    "version": "4.0.9",
     "type": "library",
     "keywords": [
         "codeigniter",
@@ -45,7 +46,10 @@
             "CIMembership\\": "src/",
             "CIMembership\\Commands\\": "src/Commands/",
             "CIMembership\\Database\\Seeds\\": "src/Database/Seeds/"
-        }
+        },
+        "exclude-from-classmap": [
+            "src/Database/Migrations/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
