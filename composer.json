@@ -76,7 +76,7 @@
         "email": "support@cimembership.io",
         "website": "https://cimembership.io"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "optimize-autoloader": true,
