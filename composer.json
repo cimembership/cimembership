@@ -1,7 +1,7 @@
 {
     "name": "cimembership/cimembership",
     "description": "CodeIgniter 4 Membership Management System - Base Platform",
-    "version": "4.0.9",
+    "version": "4.0.12",
     "type": "library",
     "keywords": [
         "codeigniter",
@@ -18,7 +18,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "CIMembership Team",
+            "name": "CIMembership",
             "email": "support@cimembership.io",
             "homepage": "https://cimembership.io"
         }
