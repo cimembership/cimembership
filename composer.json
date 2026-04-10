@@ -48,7 +48,6 @@
         "psr-4": {
             "CIMembership\\": "src/",
             "CIMembership\\Commands\\": "src/Commands/",
-            "CIMembership\\Database\\Migrations\\": "src/Database/Migrations/",
             "CIMembership\\Database\\Seeds\\": "src/Database/Seeds/"
         }
     },
