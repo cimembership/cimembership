@@ -37,7 +37,7 @@
     },
     "require-dev": {
         "codeigniter4/devkit": "^1.3",
-        "phpunit/phpunit": "^9.6",
+        "phpunit/phpunit": "^10.5",
         "fakerphp/faker": "^1.9"
     },
     "autoload": {
