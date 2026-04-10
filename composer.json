@@ -40,6 +40,10 @@
         "phpunit/phpunit": "^10.5",
         "fakerphp/faker": "^1.9"
     },
+    "allow-plugins": {
+        "php-http/discovery": true,
+        "phpstan/extension-installer": true
+    },
     "autoload": {
         "psr-4": {
             "CIMembership\\": "src/",
