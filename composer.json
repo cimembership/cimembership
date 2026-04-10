@@ -45,10 +45,13 @@
         "psr-4": {
             "CIMembership\\": "src/",
             "CIMembership\\Commands\\": "src/Commands/",
-            "CIMembership\\Database\\Seeds\\": "src/Database/Seeds/"
+            "CIMembership\\Database\\Seeds\\": "src/Database/Seeds/",
+            "App\\": "app/",
+            "Config\\": "app/Config/"
         },
         "exclude-from-classmap": [
-            "src/Database/Migrations/"
+            "src/Database/Migrations/",
+            "app/Database/Migrations/"
         ]
     },
     "autoload-dev": {
