@@ -13,38 +13,23 @@ if (version_compare(PHP_VERSION, '8.1', '<')) {
     exit(1);
 }
 
-// Define paths
-define('ROOTPATH', __DIR__ . DIRECTORY_SEPARATOR);
+// Define root paths FIRST (before any Config classes load)
+define('ROOTPATH', realpath(__DIR__) . DIRECTORY_SEPARATOR);
 define('FCPATH', ROOTPATH . 'public' . DIRECTORY_SEPARATOR);
+define('APPPATH', ROOTPATH . 'app' . DIRECTORY_SEPARATOR);
 define('WRITEPATH', ROOTPATH . 'writable' . DIRECTORY_SEPARATOR);
 define('SYSTEMPATH', realpath(ROOTPATH . 'vendor/codeigniter4/framework/system') . DIRECTORY_SEPARATOR);
+define('COMPOSER_PATH', ROOTPATH . 'vendor/autoload.php');
+define('APP_NAMESPACE', 'App');
 
 // Autoloader
 require_once ROOTPATH . 'vendor/autoload.php';
 
-// Load environment
-if (is_file(ROOTPATH . '.env')) {
-    $dotenv = Dotenv\Dotenv::createImmutable(ROOTPATH);
-    $dotenv->load();
-}
+// Now that constants are defined, we can load Config classes
+require_once APPPATH . 'Config/Paths.php';
 
-// Set environment
-define('ENVIRONMENT', $_ENV['CI_ENVIRONMENT'] ?? 'development');
+// Boot the system
+require_once SYSTEMPATH . 'Boot.php';
 
-// Set default timezone
-date_default_timezone_set($_ENV['app.timezone'] ?? 'UTC');
-
-// Error reporting
-if (ENVIRONMENT === 'development') {
-    error_reporting(-1);
-    ini_set('display_errors', '1');
-} else {
-    error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT);
-    ini_set('display_errors', '0');
-}
-
-// Run the CLI command
-require SYSTEMPATH . 'CLI/Console.php';
-
-$console = new \CodeIgniter\CLI\Console(new \CodeIgniter\CodeIgniter(new \Config\Services()));
-$console->run();
+$paths = new Config\Paths();
+exit(CodeIgniter\Boot::bootSpark($paths));
