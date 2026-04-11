@@ -41,33 +41,40 @@ class Install extends BaseCommand
             return 1;
         }
 
-        // Step 2: Run Migrations
+        // Step 2: Site Configuration (get values before creating .env)
         CLI::newLine();
-        CLI::write('Step 2: Database Setup', 'green');
+        CLI::write('Step 2: Site Configuration', 'green');
+        $siteConfig = $this->promptSiteConfig();
+        if (!$siteConfig) {
+            return 1;
+        }
+
+        // Step 3: Create .env file (needed before migrations)
+        CLI::newLine();
+        CLI::write('Step 3: Creating Environment File', 'green');
+        $this->createEnvFile($dbConfig, $siteConfig);
+
+        // Step 4: Run Migrations (after .env is created)
+        CLI::newLine();
+        CLI::write('Step 4: Database Setup', 'green');
         if (!$this->runMigrations()) {
             return 1;
         }
 
-        // Step 3: Admin Account
+        // Step 5: Admin Account
         CLI::newLine();
-        CLI::write('Step 3: Administrator Account', 'green');
+        CLI::write('Step 5: Administrator Account', 'green');
         $adminData = $this->createAdminAccount();
         if (!$adminData) {
             return 1;
         }
 
-        // Step 4: Site Configuration
+        // Step 6: Update Site Config in Database
         CLI::newLine();
-        CLI::write('Step 4: Site Configuration', 'green');
-        $siteConfig = $this->configureSite();
-        if (!$siteConfig) {
+        CLI::write('Step 6: Finalizing Site Configuration', 'green');
+        if (!$this->updateSiteConfig($siteConfig)) {
             return 1;
         }
-
-        // Step 5: Create .env file
-        CLI::newLine();
-        CLI::write('Step 5: Creating Environment File', 'green');
-        $this->createEnvFile($dbConfig, $siteConfig);
 
         // Installation complete
         CLI::newLine();
@@ -113,12 +120,13 @@ class Install extends BaseCommand
 
     private function configureDatabase(): ?array
     {
-        $host = CLI::prompt('Database Host', 'localhost');
-        $port = CLI::prompt('Database Port', '3306');
-        $database = CLI::prompt('Database Name', 'cimembership');
-        $username = CLI::prompt('Database Username', 'root');
-        $password = CLI::prompt('Database Password', null, 'hidden');
-        $prefix = CLI::prompt('Table Prefix', 'ci_');
+        // Support non-interactive mode via environment variables
+        $host = (getenv('CI_DB_HOST') !== false) ? getenv('CI_DB_HOST') : CLI::prompt('Database Host', 'localhost');
+        $port = (getenv('CI_DB_PORT') !== false) ? getenv('CI_DB_PORT') : CLI::prompt('Database Port', '3306');
+        $database = (getenv('CI_DB_NAME') !== false) ? getenv('CI_DB_NAME') : CLI::prompt('Database Name', 'cimembership');
+        $username = (getenv('CI_DB_USER') !== false) ? getenv('CI_DB_USER') : CLI::prompt('Database Username', 'root');
+        $password = (getenv('CI_DB_PASS') !== false) ? getenv('CI_DB_PASS') : CLI::prompt('Database Password');
+        $prefix = (getenv('CI_DB_PREFIX') !== false) ? getenv('CI_DB_PREFIX') : CLI::prompt('Table Prefix', 'ci_');
 
         CLI::write('Testing database connection...');
 
@@ -151,8 +159,37 @@ class Install extends BaseCommand
     private function runMigrations(): bool
     {
         try {
-            // Set database prefix from env if available
-            $prefix = env('database.default.DBPrefix', 'ci_');
+            // Load .env values directly into CodeIgniter's config
+            $dbConfig = config('Database');
+
+            // Parse .env file directly for database values
+            $envPath = ROOTPATH . '.env';
+            $dbValues = [];
+            if (file_exists($envPath)) {
+                $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                        list($key, $value) = explode('=', $line, 2);
+                        $key = trim($key);
+                        $value = trim($value);
+                        // Remove surrounding quotes if present
+                        if ((strpos($value, "'") === 0 || strpos($value, '"') === 0) && substr($value, -1) === $value[0]) {
+                            $value = substr($value, 1, -1);
+                        }
+                        $dbValues[$key] = $value;
+                    }
+                }
+            }
+
+            // Apply values to database config
+            $dbConfig->default['hostname'] = $dbValues['database.default.hostname'] ?? 'localhost';
+            $dbConfig->default['database'] = $dbValues['database.default.database'] ?? '';
+            $dbConfig->default['username'] = $dbValues['database.default.username'] ?? '';
+            $dbConfig->default['password'] = $dbValues['database.default.password'] ?? '';
+            $dbConfig->default['DBPrefix'] = $dbValues['database.default.DBPrefix'] ?? '';
+            $dbConfig->default['port'] = (int) ($dbValues['database.default.port'] ?? 3306);
+
+            // Get database connection
             $db = \Config\Database::connect();
 
             // Run migrations from CIMembership namespace
@@ -183,20 +220,27 @@ class Install extends BaseCommand
 
     private function createAdminAccount(): ?array
     {
-        $username = CLI::prompt('Admin Username', 'admin');
-        $email = CLI::prompt('Admin Email', 'admin@example.com');
+        // Support non-interactive mode via environment variables
+        $username = (getenv('CI_ADMIN_USER') !== false) ? getenv('CI_ADMIN_USER') : CLI::prompt('Admin Username', 'admin');
+        $email = (getenv('CI_ADMIN_EMAIL') !== false) ? getenv('CI_ADMIN_EMAIL') : CLI::prompt('Admin Email', 'admin@example.com');
 
-        do {
-            $password = CLI::prompt('Admin Password', null, 'hidden');
-            $passwordConfirm = CLI::prompt('Confirm Password', null, 'hidden');
+        // In non-interactive mode, use env var or default password
+        $envPassword = getenv('CI_ADMIN_PASS');
+        if ($envPassword !== false) {
+            $password = $envPassword;
+        } else {
+            do {
+                $password = CLI::prompt('Admin Password');
+                $passwordConfirm = CLI::prompt('Confirm Password');
 
-            if ($password !== $passwordConfirm) {
-                CLI::error('Passwords do not match!');
-            } elseif (strlen($password) < 8) {
-                CLI::error('Password must be at least 8 characters!');
-                $password = null;
-            }
-        } while ($password !== $passwordConfirm || strlen($password) < 8);
+                if ($password !== $passwordConfirm) {
+                    CLI::error('Passwords do not match!');
+                } elseif (strlen($password) < 8) {
+                    CLI::error('Password must be at least 8 characters!');
+                    $password = null;
+                }
+            } while ($password !== $passwordConfirm || strlen($password) < 8);
+        }
 
         try {
             $db = \Config\Database::connect();
@@ -240,14 +284,23 @@ class Install extends BaseCommand
         }
     }
 
-    private function configureSite(): ?array
+    private function promptSiteConfig(): ?array
     {
-        $siteName = CLI::prompt('Site Name', 'CIMembership');
-        $baseUrl = CLI::prompt('Base URL', 'http://localhost:8080/');
+        // Support non-interactive mode via environment variables
+        $siteName = (getenv('CI_SITE_NAME') !== false) ? getenv('CI_SITE_NAME') : CLI::prompt('Site Name', 'CIMembership');
+        $baseUrl = (getenv('CI_BASE_URL') !== false) ? getenv('CI_BASE_URL') : CLI::prompt('Base URL', 'http://localhost:8080/');
 
         // Ensure trailing slash
         $baseUrl = rtrim($baseUrl, '/') . '/';
 
+        return [
+            'site_name' => $siteName,
+            'base_url'  => $baseUrl,
+        ];
+    }
+
+    private function updateSiteConfig(array $siteConfig): bool
+    {
         try {
             $db = \Config\Database::connect();
 
@@ -257,23 +310,20 @@ class Install extends BaseCommand
             if ($optionsExist) {
                 // Update options in database - CodeIgniter adds DBPrefix automatically
                 $db->table('options')->where('option_name', 'site_name')->update([
-                    'option_value' => $siteName,
+                    'option_value' => $siteConfig['site_name'],
                     'updated_at'   => date('Y-m-d H:i:s'),
                 ]);
 
                 $db->table('options')->where('option_name', 'webmaster_email')->update([
-                    'option_value' => 'admin@' . parse_url($baseUrl, PHP_URL_HOST),
+                    'option_value' => 'admin@' . parse_url($siteConfig['base_url'], PHP_URL_HOST),
                     'updated_at'   => date('Y-m-d H:i:s'),
                 ]);
             }
 
-            return [
-                'site_name' => $siteName,
-                'base_url'  => $baseUrl,
-            ];
+            return true;
         } catch (\Exception $e) {
-            CLI::error('Failed to configure site: ' . $e->getMessage());
-            return null;
+            CLI::error('Failed to update site config: ' . $e->getMessage());
+            return false;
         }
     }
 

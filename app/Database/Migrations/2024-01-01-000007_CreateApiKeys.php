@@ -72,7 +72,7 @@ class CreateApiKeys extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addKey('user_id');
-        $this->forge->addKey('api_key');
+        // api_key already has unique index from field definition
         $this->forge->addKey('status');
         $this->forge->addForeignKey('user_id', 'users', 'id', 'SET NULL', 'CASCADE');
         $this->forge->createTable('api_keys');

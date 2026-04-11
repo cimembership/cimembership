@@ -51,7 +51,7 @@ class CreateOptions extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey('option_name');
+        // option_name already has unique index from field definition
         $this->forge->addKey('autoload');
         $this->forge->createTable('options');
 

@@ -124,7 +124,7 @@ class CreateUserProfiles extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey('user_id');
+        // user_id already has unique index from field definition
         $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('user_profiles');
     }
