@@ -78,6 +78,9 @@ class Install extends BaseCommand
         CLI::write('Access your site at: ' . ($siteConfig['base_url'] ?? 'http://localhost:8080'), 'yellow');
         CLI::write('Admin panel: ' . rtrim($siteConfig['base_url'] ?? 'http://localhost:8080', '/') . '/admin', 'yellow');
         CLI::write('Username: ' . $adminData['username'], 'yellow');
+        CLI::write('Password: ' . ($adminData['password'] ?? 'admin123'), 'yellow');
+        CLI::newLine();
+        CLI::write('⚠ IMPORTANT: Please change the default password immediately!', 'red');
         CLI::newLine();
         CLI::write('For security, remove write permissions from the following directories:', 'cyan');
         CLI::write('  - app/Config/');
@@ -96,7 +99,8 @@ class Install extends BaseCommand
 
         try {
             $db = \Config\Database::connect();
-            return $db->tableExists('users');
+            // Check for users table with or without prefix
+            return $db->tableExists('users') || $db->tableExists('ci_users');
         } catch (\Exception $e) {
             return false;
         }
@@ -147,8 +151,26 @@ class Install extends BaseCommand
     private function runMigrations(): bool
     {
         try {
+            // Set database prefix from env if available
+            $prefix = env('database.default.DBPrefix', 'ci_');
+            $db = \Config\Database::connect();
+
+            // Run migrations from CIMembership namespace
             $migrations = service('migrations');
-            $migrations->regress(0); // Reset if reinstalling
+
+            // Regress only if force flag is set and tables exist
+            try {
+                if ($db->tableExists('migrations')) {
+                    $hasMigrations = $db->table('migrations')->countAllResults() > 0;
+                    if ($hasMigrations) {
+                        CLI::write('Found existing migrations, upgrading...', 'yellow');
+                    }
+                }
+            } catch (\Exception $e) {
+                // Table might not exist, that's okay
+            }
+
+            // Run all pending migrations
             $migrations->latest();
 
             CLI::write('All migrations completed successfully!', 'green');
@@ -177,30 +199,40 @@ class Install extends BaseCommand
         } while ($password !== $passwordConfirm || strlen($password) < 8);
 
         try {
-            $userModel = model('UserModel');
+            $db = \Config\Database::connect();
 
-            $userData = [
+            // Create admin user directly with database - CodeIgniter adds DBPrefix automatically
+            $data = [
                 'username'        => $username,
                 'email'           => $email,
-                'password'        => $password,
+                'password_hash'   => password_hash($password, PASSWORD_DEFAULT),
                 'group_id'        => 1, // Super Administrator
                 'status'          => 'active',
-                'first_name'      => 'Super',
-                'last_name'       => 'Administrator',
+                'last_login_at'   => date('Y-m-d H:i:s'),
+                'created_at'      => date('Y-m-d H:i:s'),
+                'updated_at'      => date('Y-m-d H:i:s'),
             ];
 
-            $userId = $userModel->insert($userData);
+            $db->table('users')->insert($data);
+            $userId = $db->insertID();
 
-            if (!$userId) {
-                CLI::error('Failed to create admin account: ' . implode(', ', $userModel->errors()));
-                return null;
-            }
+            // Create profile
+            $db->table('user_profiles')->insert([
+                'user_id'     => $userId,
+                'first_name'  => 'Super',
+                'last_name'   => 'Administrator',
+                'timezone'    => 'UTC',
+                'locale'      => 'en',
+                'created_at'  => date('Y-m-d H:i:s'),
+                'updated_at'  => date('Y-m-d H:i:s'),
+            ]);
 
             CLI::write('Admin account created successfully!', 'green');
 
             return [
                 'username' => $username,
                 'email'    => $email,
+                'password' => $password, // Return for display only
             ];
         } catch (\Exception $e) {
             CLI::error('Failed to create admin account: ' . $e->getMessage());
@@ -216,15 +248,33 @@ class Install extends BaseCommand
         // Ensure trailing slash
         $baseUrl = rtrim($baseUrl, '/') . '/';
 
-        // Update options in database
-        $optionModel = model('OptionModel');
-        $optionModel->updateOption('site_name', $siteName);
-        $optionModel->updateOption('webmaster_email', 'admin@' . parse_url($baseUrl, PHP_URL_HOST));
+        try {
+            $db = \Config\Database::connect();
 
-        return [
-            'site_name' => $siteName,
-            'base_url'  => $baseUrl,
-        ];
+            // Check if options table exists and has data
+            $optionsExist = $db->tableExists('options');
+
+            if ($optionsExist) {
+                // Update options in database - CodeIgniter adds DBPrefix automatically
+                $db->table('options')->where('option_name', 'site_name')->update([
+                    'option_value' => $siteName,
+                    'updated_at'   => date('Y-m-d H:i:s'),
+                ]);
+
+                $db->table('options')->where('option_name', 'webmaster_email')->update([
+                    'option_value' => 'admin@' . parse_url($baseUrl, PHP_URL_HOST),
+                    'updated_at'   => date('Y-m-d H:i:s'),
+                ]);
+            }
+
+            return [
+                'site_name' => $siteName,
+                'base_url'  => $baseUrl,
+            ];
+        } catch (\Exception $e) {
+            CLI::error('Failed to configure site: ' . $e->getMessage());
+            return null;
+        }
     }
 
     private function createEnvFile(array $dbConfig, array $siteConfig): void

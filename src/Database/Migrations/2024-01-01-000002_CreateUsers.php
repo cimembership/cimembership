@@ -107,8 +107,6 @@ class CreateUsers extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey('username');
-        $this->forge->addKey('email');
         $this->forge->addKey('group_id');
         $this->forge->addKey('status');
         $this->forge->addKey('activation_token');
