@@ -97,25 +97,53 @@ cimembership/
 
 Copy `.env.example` to `.env` and configure:
 
+```bash
+cp .env.example .env
+```
+
+#### Required Settings
+
 ```env
-# Database
+# Environment (production for live sites)
+CI_ENVIRONMENT = production
+
+# Database (required)
 database.default.hostname = localhost
-database.default.database = cimembership
-database.default.username = root
-database.default.password =
+database.default.database = your_database_name
+database.default.username = your_database_user
+database.default.password = your_secure_password
 database.default.DBPrefix = ci_
 
-# Application
-app.baseURL = https://example.com/
-app.timezone = UTC
+# Application URL (required)
+app.baseURL = 'https://yourdomain.com/'
+app.timezone = 'UTC'
+```
 
-# Email (for activation, password reset)
+#### Optional Settings
+
+```env
+# Email (for user activation, password reset)
 email.protocol = smtp
-email.SMTPHost = smtp.example.com
-email.SMTPUser = user@example.com
-email.SMTPPass = password
+email.SMTPHost = smtp.yourdomain.com
+email.SMTPUser = noreply@yourdomain.com
+email.SMTPPass = your_email_password
 email.SMTPPort = 587
 email.SMTPCrypto = tls
+
+# OAuth - Facebook
+cimembership.oauth.facebook.enabled = true
+cimembership.oauth.facebook.clientId = your_facebook_app_id
+cimembership.oauth.facebook.clientSecret = your_facebook_app_secret
+
+# OAuth - Google
+cimembership.oauth.google.enabled = true
+cimembership.oauth.google.clientId = your_google_client_id
+cimembership.oauth.google.clientSecret = your_google_client_secret
+
+# reCAPTCHA (for spam protection)
+cimembership.recaptcha.enabled = true
+cimembership.recaptcha.siteKey = your_recaptcha_site_key
+cimembership.recaptcha.secretKey = your_recaptcha_secret_key
 ```
 
 ### OAuth Configuration
