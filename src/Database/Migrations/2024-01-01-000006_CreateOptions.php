@@ -56,7 +56,6 @@ class CreateOptions extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey('option_name');
         $this->forge->addKey('autoload');
         $this->forge->createTable('options');
 

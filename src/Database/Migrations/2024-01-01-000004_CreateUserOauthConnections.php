@@ -36,7 +36,7 @@ class CreateUserOauthConnections extends Migration
             ],
             'provider_id' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '190',
                 'null'       => false,
             ],
             'access_token' => [

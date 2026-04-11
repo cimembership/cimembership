@@ -61,9 +61,6 @@ class CreateLoginAttempts extends Migration
         $this->forge->addKey('user_id');
         $this->forge->addKey('created_at');
         $this->forge->createTable('login_attempts');
-
-        // Create index for tracking failed attempts
-        $this->db->query("CREATE INDEX idx_failed_attempts ON login_attempts(ip_address, success, created_at)");
     }
 
     public function down(): void

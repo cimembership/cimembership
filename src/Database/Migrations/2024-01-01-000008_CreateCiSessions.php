@@ -18,7 +18,7 @@ class CreateCiSessions extends Migration
         $this->forge->addField([
             'id' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '128',
+                'constraint' => '40',
                 'null'       => false,
             ],
             'ip_address' => [
