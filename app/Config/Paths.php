@@ -13,5 +13,5 @@ class Paths extends BaseConfig
     public string $writableDirectory = __DIR__ . '/../../writable';
     public string $testsDirectory = __DIR__ . '/../../tests';
     public string $viewDirectory = __DIR__ . '/../Views';
-    public string $minPhpVersion = '8.1';
+    public string $minPhpVersion = '8.2';
 }
