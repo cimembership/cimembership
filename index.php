@@ -1,12 +1,7 @@
-#!/usr/bin/env php
 <?php
 
 use CodeIgniter\Boot;
 use Config\Paths;
-
-if (str_starts_with(PHP_SAPI, 'cgi')) {
-    exit("The cli tool is not supported when running php-cgi. It needs php-cli to function!\n\n");
-}
 
 $minPhpVersion = '8.2';
 if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {
@@ -16,15 +11,17 @@ if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {
         PHP_VERSION,
     );
 
-    exit($message);
+    header('HTTP/1.1 503 Service Unavailable.', true, 503);
+    echo $message;
+
+    exit(1);
 }
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
 
-define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
-
-chdir(FCPATH);
+if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
+    chdir(FCPATH);
+}
 
 require FCPATH . '../app/Config/Paths.php';
 
@@ -32,4 +29,4 @@ $paths = new Paths();
 
 require $paths->systemDirectory . '/Boot.php';
 
-exit(Boot::bootSpark($paths));
+exit(Boot::bootWeb($paths));
