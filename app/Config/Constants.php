@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Config;
 
-use CodeIgniter\Config\BaseConfig;
+defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 
-class Constants extends BaseConfig
+class Constants
 {
     /**
      * @deprecated Use \CodeIgniter\HTTP\Response::HTTP_OK
