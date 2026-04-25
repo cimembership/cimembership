@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <?php if (empty($oauth)): ?>
                         <p class="text-muted mb-0">No connected accounts.</p>
-                    <?php else: ?
+                    <?php else: ?>
                         <ul class="list-group list-group-flush">
                             <?php foreach ($oauth as $connection): ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">

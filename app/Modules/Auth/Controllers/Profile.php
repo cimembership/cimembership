@@ -67,7 +67,7 @@ class Profile extends BaseController
         $rules = [
             'first_name'  => 'permit_empty|max_length[100]',
             'last_name'   => 'permit_empty|max_length[100]',
-            'display_name'=>> 'permit_empty|max_length[100]',
+            'display_name' => 'permit_empty|max_length[100]',
             'phone'       => 'permit_empty|max_length[50]',
             'company'     => 'permit_empty|max_length[250]',
             'website'     => 'permit_empty|valid_url|max_length[255]',
