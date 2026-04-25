@@ -134,7 +134,7 @@
                             <li class="list-group-item px-0">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <?php if ($activity['success']): ?
+                                        <?php if ($activity['success']): ?>
                                             <i class="fas fa-check-circle text-success me-2"></i>
                                         <?php else: ?>
                                             <i class="fas fa-times-circle text-danger me-2"></i>

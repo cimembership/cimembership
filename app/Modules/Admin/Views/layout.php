@@ -243,7 +243,7 @@
                         : session()->getFlashdata('error') ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            <?php endif; ?
+            <?php endif; ?>
 
             <?= $content ?? '' ?>
         </div>

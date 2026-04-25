@@ -91,7 +91,7 @@
                 <form action="/admin/settings/oauth" method="post">
                     <?= csrf_field() ?>
 
-                    <?php $providers = ['facebook', 'google', 'github', 'linkedin', 'microsoft']; ?
+                    <?php $providers = ['facebook', 'google', 'github', 'linkedin', 'microsoft']; ?>
 
                     <ul class="nav nav-pills mb-3" id="oauthTab" role="tablist">
                         <?php foreach ($providers as $i => $provider): ?>
